@@ -523,7 +523,11 @@ def resume_queued_jobs_in_thread_pool(session_factory: sessionmaker[Session], se
 
 def warmup_available_models(settings: Settings) -> None:
     """Pre-load available YOLO weights into RAM in the background so the first inference is fast."""
+    import os
+
     if not settings.ai_inference_enabled:
+        return
+    if os.environ.get("AI_WARMUP_ON_STARTUP", "true").lower() in ("0", "false", "no"):
         return
 
     def _preload() -> None:

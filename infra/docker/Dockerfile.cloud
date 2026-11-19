@@ -29,6 +29,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     AI_WORKER_MODE=inline_thread \
     AI_INFERENCE_ENABLED=true \
+    AI_WARMUP_ON_STARTUP=false \
     AI_WEIGHTS_DIR=/app/apps/api/services/ai-worker/weights \
     PYTHONPATH=/app/apps/api:/app/apps/api/services/ai-worker:/app/apps/api/services/edge-gateway
 
@@ -56,4 +57,4 @@ USER appuser
 EXPOSE 8000
 STOPSIGNAL SIGTERM
 
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]

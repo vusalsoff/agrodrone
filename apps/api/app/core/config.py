@@ -146,6 +146,16 @@ class Settings(BaseSettings):
                 raise ValueError("LOCAL_NO_AUTH_MODE cannot be enabled in production.")
         return self
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalize_database_url(cls, value: str) -> str:
+        raw = str(value).strip()
+        if raw.startswith("postgres://"):
+            return "postgresql+psycopg://" + raw[len("postgres://") :]
+        if raw.startswith("postgresql://"):
+            return "postgresql+psycopg://" + raw[len("postgresql://") :]
+        return raw
+
     @field_validator("jwt_secret_key")
     @classmethod
     def validate_secret_strength(cls, value: str) -> str:

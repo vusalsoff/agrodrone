@@ -1,0 +1,14 @@
+# AgroDrone — Final Verification Matrix
+
+| Module | Feature | Test Method | Expected Behavior | Actual Behavior | Result | Evidence | Remaining Issue |
+|---|---|---|---|---|---|---|---|
+| **Auth & RBAC** | Register, Login, Logout, Refresh Rotation, CSRF, Rate Limit | Pytest + Penetration + Playwright | Secure Argon2id, HttpOnly/CSRF, 403/401/429 enforcement | Matched expected | `VERIFIED` | `test_auth_phase2.py`, `test_ultimate_master_audit.py` | None |
+| **Frontend UI** | All 12 App Routes, Desktop/Tablet/Mobile, Keyboard Tab | Playwright Chromium + Vitest + Next Build | Renders cleanly, 0 5xx, 0 broken images, 0 overflow | Matched expected | `VERIFIED` | `ultimate_playwright_audit.py`, `screenshots/` | None |
+| **Fields & GIS** | Field CRUD, GeoJSON Polygon, Geodesic Ha, MapLibre 6.19 | Pytest + Vitest + Playwright `/maps` | Valid area, MapLibre canvas & worker load cleanly | Matched expected | `VERIFIED` | `test_fields_geo.py`, `geo.test.ts`, `03_maps.png` | None |
+| **Devices & Missions** | Device CRUD, ESP32 Presets, Mission Transitions, Audit | Pytest + Playwright | Verified-contact online policy, valid state machine | Matched expected | `VERIFIED` | `test_devices_missions.py`, `04_devices.png`, `05_missions.png` | None |
+| **Media & Storage** | Magic-byte, Traversal, Private `/content`, S3 Presign | Pytest + Penetration | Rejects spoofing, blocks IDOR `403`, SHA-256 intact | Matched expected | `VERIFIED` | `test_media_security.py`, `test_ultimate_master_audit.py` | Live MinIO `BLOCKED` |
+| **AgroVision AI** | YOLOv8n JPEG/PNG/Video, Checksum, Worker Recovery, Review | Pytest (`@real_model`) + `app.worker` | Real detections in ~2.0–2.5s CPU; specialized rejected | Matched expected | `VERIFIED` | `test_agrovision_*.py`, `test_phase7_*.py` | AGPL-3.0 commercial review |
+| **ESP32-CAM Gateway** | Enroll, Rotate, Revoke, Replay Guard, MJPEG, Spool, Relay | Pytest + `agrodrone-gateway` | Simulated MJPEG & replay/spool work end-to-end | Matched expected | `PARTIALLY VERIFIED` | `test_edge_gateway.py`, `test_ultimate_master_audit.py` | Physical camera `BLOCKED` |
+| **Analytics, Alerts & Reports** | Deduped Video Stats, 6 Triggers, Cooldowns, PDF/CSV/JSON | Pytest + Vitest + Playwright | Exact DB counts, CSV injection neutralized, PDF valid | Matched expected | `VERIFIED` | `test_phase5_analytics_alerts_reports.py`, `phase5.test.tsx` | SMTP unset (honest) |
+| **Database & Migrations** | Alembic `0001`–`0005` Upgrade/Downgrade, Restart Persistence | Pytest + Alembic | Clean SQLite migration & restart persistence | Matched expected | `VERIFIED` | `test_migrations.py`, `test_phase7_e2e_and_performance.py` | Live PG 16 `BLOCKED` |
+| **Docker & Cloud** | Multi-stage Non-root Containers, Compose Prod, CI/CD | Inspection (`DOCKER_NOT_INSTALLED`) | Ready for Docker host / GitHub Actions | Not executed locally | `BLOCKED` | `Dockerfile*`, `ci.yml`, `deploy.yml` | Install Docker Desktop |

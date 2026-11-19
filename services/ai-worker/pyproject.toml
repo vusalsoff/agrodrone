@@ -1,0 +1,23 @@
+[project]
+name = "agrodrone-ai-worker"
+version = "0.3.0"
+description = "AgroDrone Phase 3 AgroVision AI Engine — Ultralytics YOLO, PyTorch, OpenCV, Pillow & NumPy"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=1.26.0,<3.0.0",
+    "pillow>=10.0.0,<13.0.0",
+]
+
+[project.optional-dependencies]
+runtime = [
+    "ultralytics>=8.3.0,<9.0.0",
+    "torch>=2.4.0,<3.0.0",
+    "opencv-python-headless>=4.10.0,<5.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["agrovision_worker"]

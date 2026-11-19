@@ -1,0 +1,57 @@
+# syntax=docker/dockerfile:1
+# Single-container AgroDrone API + AI Worker (PyTorch + Ultralytics YOLOv8 + OpenCV)
+# Optimized for Railway / Render / Fly.io single-service deployment.
+FROM python:3.12-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_SYSTEM_PYTHON=1
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    libgl1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir uv==0.6.14
+
+COPY services/ai-worker ./services/ai-worker
+COPY services/edge-gateway ./services/edge-gateway
+COPY apps/api/pyproject.toml ./apps/api/pyproject.toml
+COPY apps/api/app ./apps/api/app
+
+RUN uv pip install --no-cache --system "./apps/api[s3,ai]" ./services/ai-worker ./services/edge-gateway
+
+FROM python:3.12-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    AI_WORKER_MODE=inline_thread \
+    AI_INFERENCE_ENABLED=true \
+    AI_WEIGHTS_DIR=/app/apps/api/services/ai-worker/weights
+
+WORKDIR /app/apps/api
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    libgl1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY services ./services
+COPY apps/api/alembic.ini ./alembic.ini
+COPY apps/api/alembic ./alembic
+COPY apps/api/app ./app
+COPY apps/api/scripts ./scripts
+
+RUN python ./services/ai-worker/scripts/fetch_weights.py \
+    && adduser --disabled-password --gecos "" appuser \
+    && mkdir -p /app/apps/api/data/storage \
+    && chown -R appuser:appuser /app
+
+USER appuser
+EXPOSE 8000
+STOPSIGNAL SIGTERM
+
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

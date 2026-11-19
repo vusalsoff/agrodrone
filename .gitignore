@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Next.js / Frontend build artifacts
+apps/web/.next/
+apps/web/out/
+apps/web/build/
+apps/web/coverage/
+apps/web/next-env.d.ts
+
+# Environment files (never commit secrets)
+.env
+.env.local
+.env.*.local
+apps/api/.env
+apps/web/.env
+apps/web/.env.local
+
+# Local development database & media storage
+data/
+apps/api/data/
+*.db
+*.sqlite3
+
+# AI model weights & local datasets (track metadata, not binary weights)
+*.pt
+*.onnx
+*.engine
+services/ai-worker/weights/*
+!services/ai-worker/weights/model_manifest.json
+services/ai-worker/datasets/
+
+# Logs & OS artifacts
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

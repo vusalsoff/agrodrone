@@ -1,0 +1,35 @@
+{
+  "models": [
+    {
+      "model_id": "plant-disease-yolov8",
+      "name": "Plant Disease Detector (YOLOv8 · 15 Leaf Classes)",
+      "version": "1.0.0-community",
+      "detection_mode": "disease",
+      "architecture": "YOLOv8 Object Detection (PyTorch)",
+      "license_spdx": "Open-Community",
+      "dataset_scope": "PlantVillage 15-class leaf disease subset (Pepper, Potato, Tomato)",
+      "weights_filename": "plant_disease_yolov8.pt",
+      "expected_sha256": "0e6fc1007e80643c90a1246f5c31b185e628d33954c5c1ca542335b1574a53fb",
+      "allow_unbenchmarked_community_weights": true,
+      "supported_classes": [
+        "Pepper__bell___Bacterial_spot",
+        "Pepper__bell___healthy",
+        "Potato___Early_blight",
+        "Potato___Late_blight",
+        "Potato___healthy",
+        "Tomato_Bacterial_spot",
+        "Tomato_Early_blight",
+        "Tomato_Late_blight",
+        "Tomato_Leaf_Mold",
+        "Tomato_Septoria_leaf_spot",
+        "Tomato_Spider_mites_Two_spotted_spider_mite",
+        "Tomato__Target_Spot",
+        "Tomato__Tomato_YellowLeaf__Curl_Virus",
+        "Tomato__Tomato_mosaic_virus",
+        "Tomato_healthy"
+      ],
+      "default_confidence": 0.25,
+      "honesty_disclaimer": "Community-trained PlantVillage YOLOv8 weights (peachfawn/yolov8-plant-disease) for 15 Pepper/Potato/Tomato leaf classes. Not yet benchmarked by AgroDrone on local OV2640 field imagery; use human review."
+    }
+  ]
+}

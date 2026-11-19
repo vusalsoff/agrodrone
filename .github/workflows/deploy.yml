@@ -1,0 +1,44 @@
+name: AgroDrone Production Release (Manual Approval Required)
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Immutable Git SHA or release tag to deploy"
+        required: true
+        type: string
+      run_migrations:
+        description: "Run alembic upgrade head before rolling services"
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  pre-release-checks:
+    name: Validate Release Target
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify non-empty image tag
+        run: |
+          if [ -z "${{ inputs.image_tag }}" ]; then
+            echo "image_tag is required"
+            exit 1
+          fi
+          echo "Prepared release candidate tag: ${{ inputs.image_tag }}"
+
+  deploy-production:
+    name: Deploy to Production (Approval Gate)
+    runs-on: ubuntu-latest
+    needs: [pre-release-checks]
+    # Configure 'production' environment in GitHub Settings -> Environments with Required Reviewers.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pre-migration backup reminder
+        run: |
+          echo "Step 1: Trigger managed PostgreSQL snapshot before running migrations (see BACKUP_RESTORE.md)."
+          echo "Step 2: Run 'alembic upgrade head' against production DATABASE_URL if run_migrations=${{ inputs.run_migrations }}."
+          echo "Step 3: Push signed images for tag '${{ inputs.image_tag }}' to private registry and roll web, api, and ai-worker."
+          echo "Step 4: Verify GET /api/v1/ready returns HTTP 200."
